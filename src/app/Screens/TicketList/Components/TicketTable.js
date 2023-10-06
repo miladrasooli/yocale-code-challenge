@@ -2,7 +2,7 @@ import TicketListHeader from "./TicketListHeader";
 import TicketRow from "./TicketRow";
 
 
-const TicketTable = ({ tickets, isLoading, onSelect, filterChanged }) => {
+const TicketTable = ({ tickets, isLoading, onSelect, filterChanged,status }) => {
 
     const _onSelect = (id) => {
         onSelect(id)
@@ -12,7 +12,7 @@ const TicketTable = ({ tickets, isLoading, onSelect, filterChanged }) => {
     return <div className="p-5">
         <label>
             Filter by status:
-            <select onChange={filterChanged}>
+            <select onChange={filterChanged} value={status}>
                 <option value={'select'}>Select</option>
                 <option value={'unassigned'}>Unassigned</option>
                 <option value={'completed'}>Completed</option>

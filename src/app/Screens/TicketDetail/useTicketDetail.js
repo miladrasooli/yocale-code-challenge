@@ -11,6 +11,7 @@ const useTicketDetail = () => {
 
     const [error, setError] = useState({ error: false, type: 'general', message: '' })
     const abortController = useRef(new AbortController());
+    const isFirstLoad=useRef(true)
 
     const getTicket = (id) => {
 

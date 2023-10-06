@@ -2,18 +2,21 @@ import { useHistory  } from "react-router-dom";
 import TicketTable from "./Components/TicketTable";
 import useTicketList from "./useTicketList";
 import Container from "../Layouts/Container";
+import { useState } from "react";
 
 export default function TicketList() {
 
     const [isLoading, tickets, error,filter] = useTicketList();
     const history = useHistory();
-
+    const [status,setStatus]=useState('select')
+    
     const onTicketSelect=(id)=>{
         history.push(`/ticket/${id}`)
     }
 
     const onFilter=(event)=>{
         filter(event.target.value)
+        setStatus(event.target.value)
     }
     return (
         <Container>
@@ -33,10 +36,11 @@ export default function TicketList() {
                 </div>
             </div>
 
-            <div className="-mx-4 mt-10 ring-1 ring-gray-300 sm:mx-0 sm:rounded-lg">
-                {isLoading&&<div>Loading tickets...</div>}
-                {!isLoading&&tickets.length>0&&<TicketTable filterChanged={onFilter} tickets={tickets} isLoading={isLoading} onSelect={onTicketSelect}/>}
-                {!isLoading&&tickets.length==0&&<div>No tickets to show</div>}
+            <div className="-mx-4 mt-10 ring-1 ring-gray-300 sm:mx-0 sm:rounded-lg p-5">
+                {isLoading&& !error.error &&<div>Loading tickets...</div>}
+                {!isLoading&&!error.error &&tickets.length>0&&<TicketTable status={status} filterChanged={onFilter} tickets={tickets} isLoading={isLoading} onSelect={onTicketSelect}/>}
+                {!isLoading&&!error.error &&tickets.length==0&&<div>No tickets to show</div>}
+                {error.error&&<div className="bg-red-300 text-white rounded-md text-center py-2">{error.message}</div>}
             </div>
         </div>
         </Container>

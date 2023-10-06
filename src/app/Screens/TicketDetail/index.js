@@ -24,7 +24,9 @@ const TicketDetail = () => {
     const onChangeStatus = (event) => {
         changeStatus(ticket.id,event.target.value)
     }
+
     return <Container>
+
         {isLoadingUser && <div>Loading user...</div>}
         {!isLoadingUser && user != null && <UserCard user={user} />}
 

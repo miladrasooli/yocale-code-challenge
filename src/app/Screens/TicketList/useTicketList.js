@@ -10,13 +10,15 @@ const useTicketList = () => {
 
     const loadTickets = async () => {
 
+        
         try {
             setIsLoading(true);
             const { data } = await Tickets.all(abortController.current);
+            
             setTickets(data)
         }
         catch (er) {
-
+            
             setTickets([]);
             setError({
                 error: true,
@@ -39,8 +41,15 @@ const useTicketList = () => {
             abortController.current.abort()
         try {
             setIsLoading(true);
-            const { data } = await Tickets.filter(value, abortController.current);
-            setTickets(data)
+
+            if (value.trim() == 'select') {
+
+                loadTickets()
+            }
+            else {
+                const { data } = await Tickets.filter(value, abortController.current);
+                setTickets(data)
+            }
         }
         catch (er) {
 
