@@ -6,19 +6,21 @@ const useTicketList = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState({ error: false, type: 'general', message: '' })
 
-    const abortController = useRef(new AbortController());
-
+    const abortController = useRef(null);
     const loadTickets = async () => {
-
-        
         try {
+
+            if (abortController.current)
+                abortController.current.abort();
+
+            abortController.current = new AbortController();
+
             setIsLoading(true);
+    
             const { data } = await Tickets.all(abortController.current);
-            
             setTickets(data)
         }
         catch (er) {
-            
             setTickets([]);
             setError({
                 error: true,
@@ -31,20 +33,28 @@ const useTicketList = () => {
         }
     }
     useEffect(() => {
+
         loadTickets();
-        return () => abortController.current.abort()
+        return () => {
+            if (abortController.current)
+                abortController.current.abort()
+        }
 
     }, [])
 
     const filter = async (value) => {
-        if (isLoading)
-            abortController.current.abort()
+
+        if (abortController.current)
+            abortController.current.abort();
+
+        abortController.current=new AbortController();
+
         try {
             setIsLoading(true);
 
             if (value.trim() == 'select') {
-
-                loadTickets()
+                const { data } = await Tickets.all(abortController.current);
+                setTickets(data)
             }
             else {
                 const { data } = await Tickets.filter(value, abortController.current);

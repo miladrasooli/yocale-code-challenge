@@ -9,9 +9,12 @@ const useTicketDetail = () => {
     const [isLoadingTicket, setIsLoadingTicket] = useState(false);
     const [isLoadingUser, setIsLoadingUser] = useState(false);
 
-    const [error, setError] = useState({ error: false, type: 'general', message: '' })
-    const abortController = useRef(new AbortController());
-    const isFirstLoad=useRef(true)
+    const [error, setError] = useState({ error: false, type: 'general', message: '' });
+
+    const userAbortController = useRef(null);
+    const ticketAbortController = useRef(null);
+
+    const isFirstLoad = useRef(true)
 
     const getTicket = (id) => {
 
@@ -24,8 +27,13 @@ const useTicketDetail = () => {
 
     const loadSingleUser = async (id) => {
         try {
+            if (userAbortController.current)
+                userAbortController.current.abort();
+
+            userAbortController.current = new AbortController();
+
             setIsLoadingUser(true);
-            const { data } = await Users.one(id, abortController.current);
+            const { data } = await Users.one(id, userAbortController.current);
             setUser(data)
         }
         catch (er) {
@@ -43,8 +51,14 @@ const useTicketDetail = () => {
 
     const loadSingleTicket = async (id) => {
         try {
+
+            if (ticketAbortController.current)
+                ticketAbortController.current.abort();
+
+            ticketAbortController.current = new AbortController();
+
             setIsLoadingTicket(true);
-            const { data } = await Tickets.one(id);
+            const { data } = await Tickets.one(id,ticketAbortController.current);
             setTicket(data)
         }
         catch (er) {
@@ -64,7 +78,7 @@ const useTicketDetail = () => {
             setIsLoadingTicket(true);
             await Tickets.updateStatus(id, status);
             setIsLoadingTicket(false);
-            setTicket({...ticket,status:status})
+            setTicket({ ...ticket, status: status })
         }
         catch (er) {
             setIsLoadingTicket(false)
@@ -81,7 +95,13 @@ const useTicketDetail = () => {
     }
 
     useEffect(() => {
-        return abortController.current.abort();
+        return () => {
+            if (ticketAbortController.current)
+                ticketAbortController.current.abort();
+
+            if (userAbortController.current)
+                userAbortController.current.abort();
+        }
     }, [])
 
 
